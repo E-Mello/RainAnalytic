@@ -1,7 +1,12 @@
+import { Alert, StyleSheet, View } from 'react-native'
+import { Button, Input } from 'react-native-elements'
+
 import { Feather } from '@expo/vector-icons'
+import Login from '../screens/Login';
 import StackRoutes from './stack.routes';
 import TabRoutes from './tab.routes'
 import { createDrawerNavigator } from '@react-navigation/drawer'
+import { supabase } from '../lib/supabase'
 
 const Drawer = createDrawerNavigator();
 
@@ -34,7 +39,36 @@ export default function DrawerRoutes() {
                     drawerLabel: 'Meu Perfil'
                 }}
             />
-
+            <Drawer.Screen
+                name='Logout'
+                options={{
+                    drawerLabel: 'Logout',
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name='log-out' size={size} color={color} />
+                    ),
+                }}
+            >
+                {() => (
+                    <View style={styles.verticallySpaced}>
+                        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+                    </View>
+                )}
+            </Drawer.Screen>
         </Drawer.Navigator>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        marginTop: 40,
+        padding: 12,
+    },
+    verticallySpaced: {
+        paddingTop: 4,
+        paddingBottom: 4,
+        alignSelf: 'stretch',
+    },
+    mt20: {
+        marginTop: 20,
+    },
+})

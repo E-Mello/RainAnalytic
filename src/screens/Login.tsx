@@ -1,16 +1,16 @@
+import 'react-native-url-polyfill/auto'
+
 import { useEffect, useState } from 'react'
 
-import DrawerRoutes from './drawer.routes'
-import Login from '../screens/Login'
+import Account from '../components/Account'
+import Auth from '../components/Auth'
 import { NavigationContainer } from '@react-navigation/native'
+import Routes from '../routes'
 import { Session } from '@supabase/supabase-js'
+import { View } from 'react-native'
 import { supabase } from '../lib/supabase'
 
-// import TabRoutes from './tab.routes'
-
-
-// O arquivo de rotas é responsável pelo contexto de navegação da aplicação
-export default function Routes() {
+export default function Login() {
     const [session, setSession] = useState<Session | null>(null)
 
     useEffect(() => {
@@ -23,10 +23,8 @@ export default function Routes() {
         })
     }, [])
     return (
-        // Iniciamente, coloque apenas  <TabRoutes /> aqui, para interpretar a navegação entre as tabs
-        // Após isto, defini que <DrawerRoutes /> vai chamar a <TabRoutes /> dessa forma, criando um alinhamento de tipos de rota
         <NavigationContainer independent={true}>
-            {session && session.user ? <DrawerRoutes /> : <Login />}
+            {session && session.user ? <Routes /> : <Auth />}
         </NavigationContainer>
     )
 }
