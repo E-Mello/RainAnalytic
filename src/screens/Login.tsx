@@ -24,7 +24,7 @@ export default function Login() {
     }, [])
     return (
         <NavigationContainer independent={true}>
-            {session && session.user ? <Routes /> : <Auth />}
+            <Auth />
         </NavigationContainer>
     )
 }

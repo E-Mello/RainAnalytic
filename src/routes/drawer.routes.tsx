@@ -22,7 +22,7 @@ export default function DrawerRoutes() {
                 // estamos pedindo para ele renderizar uma nova rota
                 options={{
                     drawerIcon: ({ color, size }) => {
-                        return <Feather name='plus' size={size} color={color} />
+                        return <Feather name='home' size={size} color={color} />
                     },
                     drawerLabel: 'Inicio'
                 }}

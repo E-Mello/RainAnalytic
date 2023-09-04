@@ -12,6 +12,7 @@ export default function Account({ session }: { session: Session }) {
     const [website, setWebsite] = useState('')
     const [avatarUrl, setAvatarUrl] = useState('')
 
+
     useEffect(() => {
         if (session) getProfile()
     }, [session])
