@@ -35,10 +35,7 @@ export default function Profile({ session }: { session: Session | null }) {
             }
         }
 
-        // Verifica se user é null, se for, chama fetchUser
-        if (user === null) {
-            fetchUser();
-        }
+        fetchUser(); // buscar informações do usuário
     }, [user]); // O segundo argumento [] assegura que useEffect seja chamado apenas uma vez
 
 
