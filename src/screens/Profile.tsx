@@ -7,10 +7,12 @@ import { ScrollView } from "react-native-gesture-handler";
 import { UserProfile } from "../types/Profile";
 import styles from '../styles/styleProfile'
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../components/AuthSupabase";
 
-export default function Profile({ session }: { session: Session | null }) {
-    // Estado para armazenar os dados do perfil
-    const [profileData, setProfileData] = useState<UserProfile | undefined>(Object);
+export default function Profile() {
+    const { session, user, signOut } = useAuth(); // Obter sessão e usuário do contexto
+
+    const [profileData, setProfileData] = useState<UserProfile | undefined>(undefined);
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
     const [website, setWebsite] = useState('');
@@ -18,31 +20,21 @@ export default function Profile({ session }: { session: Session | null }) {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
 
-    const [user, setUser] = useState<User | null>(null);
-
     useEffect(() => {
-        // Função assíncrona para buscar os detalhes do usuário
-        async function fetchUser() {
-            try {
-                const { data: { user }, error } = await supabase.auth.getUser();
-                setUser(user);
-                if (error) {
-                    console.log(error);
-                };
-                getProfile();
-            } catch (error) {
-                console.error("Erro ao buscar informações do usuário:", error);
-            }
+        // Atualize o estado com os dados do usuário da sessão
+        if (user) {
+            setUsername(user.user_metadata?.username || '');
+            setWebsite(user.user_metadata?.website || '');
+            setFullName(user.user_metadata?.full_name || '');
+            setEmail(user.email || '');
+            setPhone(user.user_metadata?.phone || '');
         }
-
-        fetchUser(); // buscar informações do usuário
-    }, [user]); // O segundo argumento [] assegura que useEffect seja chamado apenas uma vez
-
+    }, [user]);
 
     useEffect(() => {
         if (session) {
             getProfile();
-        };
+        }
     }, [session]);
 
     async function getProfile() {
@@ -62,7 +54,6 @@ export default function Profile({ session }: { session: Session | null }) {
 
             if (data) {
                 setProfileData(data);
-                // Remova as atribuições iniciais dos estados aqui
             }
         } catch (error) {
             if (error instanceof Error) {
@@ -79,13 +70,20 @@ export default function Profile({ session }: { session: Session | null }) {
             setLoading(true);
             if (!user) throw new Error('No user on the session!');
 
+            // Busque os valores atuais dos campos do estado profileData
+            const currentUsername = profileData?.username || '';
+            const currentFullName = profileData?.full_name || '';
+            const currentWebsite = profileData?.website || '';
+            const currentEmail = profileData?.email || '';
+            const currentPhone = profileData?.phone || '';
+
             const updates = {
                 id: user.id,
-                username,
-                full_name: fullName,
-                email,
-                phone,
-                website,
+                username: username || currentUsername, // Use o valor alterado ou o valor atual
+                full_name: fullName || currentFullName, // Use o valor alterado ou o valor atual
+                email: email || currentEmail, // Use o valor alterado ou o valor atual
+                phone: phone || currentPhone, // Use o valor alterado ou o valor atual
+                website: website || currentWebsite, // Use o valor alterado ou o valor atual
                 avatar_url: profileData?.avatar_url,
                 updated_at: new Date(),
             };
@@ -96,14 +94,14 @@ export default function Profile({ session }: { session: Session | null }) {
                 throw error;
             }
 
-            // Atualizar profileData com os novos dados
+            // Atualize profileData com os novos dados
             setProfileData((prevProfileData) => ({
                 ...prevProfileData!,
-                username,
-                full_name: fullName,
-                email,
-                phone,
-                website,
+                username: updates.username,
+                full_name: updates.full_name,
+                email: updates.email,
+                phone: updates.phone,
+                website: updates.website,
             }));
 
         } catch (error) {
@@ -114,6 +112,7 @@ export default function Profile({ session }: { session: Session | null }) {
             setLoading(false);
         }
     }
+
 
 
     return (
