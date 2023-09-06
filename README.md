@@ -1,9 +1,9 @@
 # RainAnalytic 🌧️
 
-![GitHub repo size](https://img.shields.io/github/repo-size/seu-usuario/RainAnalytic)
-![GitHub stars](https://img.shields.io/github/stars/seu-usuario/RainAnalytic)
-![GitHub forks](https://img.shields.io/github/forks/seu-usuario/RainAnalytic)
-![GitHub license](https://img.shields.io/github/license/seu-usuario/RainAnalytic)
+![GitHub repo size](https://img.shields.io/github/repo-size/E-Mello/RainAnalytic)
+![GitHub stars](https://img.shields.io/github/stars/E-Mello/RainAnalytic)
+![GitHub forks](https://img.shields.io/github/forks/E-Mello/RainAnalytic)
+![GitHub license](https://img.shields.io/github/license/E-Mello/RainAnalytic)
 
 RainAnalytic é uma aplicação React Native que utiliza o poder do biomimético besouro-da-Namíbia para analisar a chuva, captar e armazenar orvalho e sereno de forma eficiente. Esta aplicação é desenvolvida com a integração do Supabase e Expo Go para um desempenho de alta qualidade.
 
