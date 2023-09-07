@@ -1,6 +1,6 @@
-import Dashboard from '../screens/Dashboard'
 import { Feather } from '@expo/vector-icons'
-import New from '../screens/New'
+import RainData from '../screens/RainData'
+import StorageRain from '../screens/StorageRain'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 const Tab = createBottomTabNavigator();
@@ -13,23 +13,23 @@ export default function TabRoutes() {
         <Tab.Navigator screenOptions={{ headerShown: false }}>
             <Tab.Screen
                 name='feed'
-                component={Dashboard}
+                component={RainData}
                 options={{
                     tabBarIcon: ({ color, size }) => {
-                        return <Feather name='home' size={size} color={color} />
+                        return <Feather name='cloud-rain' size={size} color={color} />
                     },
-                    tabBarLabel: 'Inicio'
+                    tabBarLabel: 'Dados da chuva'
                 }}
             />
 
             <Tab.Screen
                 name='new'
-                component={New}
+                component={StorageRain}
                 options={{
                     tabBarIcon: ({ color, size }) => {
-                        return <Feather name='plus' size={size} color={color} />
+                        return <Feather name='cloud' size={size} color={color} />
                     },
-                    tabBarLabel: 'Novo'
+                    tabBarLabel: 'Armazenamento da chuva'
                 }}
             />
         </Tab.Navigator>
