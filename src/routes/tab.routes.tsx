@@ -1,5 +1,5 @@
+import Dashboard from '../screens/Dashboard'
 import { Feather } from '@expo/vector-icons'
-import Feed from '../screens/Feed'
 import New from '../screens/New'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
@@ -13,7 +13,7 @@ export default function TabRoutes() {
         <Tab.Navigator screenOptions={{ headerShown: false }}>
             <Tab.Screen
                 name='feed'
-                component={Feed}
+                component={Dashboard}
                 options={{
                     tabBarIcon: ({ color, size }) => {
                         return <Feather name='home' size={size} color={color} />
