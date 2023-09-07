@@ -54,18 +54,10 @@ export default function Feed() {
     };
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Dashboard</Text>
-            {user && (
-                <View key={user.id}>
-                    <Text>User ID: {user.id}</Text>
-                    <Text>User Email: {user.email}</Text>
-                    <Text>User Phone: {user.phone}</Text>
-                </View>
-            )}
-
             <Picker
                 selectedValue={selectedMonth}
                 onValueChange={(itemValue: React.SetStateAction<string>) => setSelectedMonth(itemValue)}
+                style={{ height: 50, width: 150 }}
             >
                 <Picker.Item label="January" value="January" />
                 <Picker.Item label="February" value="February" />
