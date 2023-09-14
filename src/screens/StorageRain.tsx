@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import PieChartComponent from "../components/LineChartComponent";
+import styles from "../styles/styleStorageRain";
 
 export default function StorageRain() {
     return (
@@ -14,22 +15,3 @@ export default function StorageRain() {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "transparent",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    pieChartContainer: {
-        justifyContent: "center",
-        alignContent: "center",
-        width: "100%",
-        alignItems: "center",
-    },
-})

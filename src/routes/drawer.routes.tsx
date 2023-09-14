@@ -1,21 +1,62 @@
-import { Alert, StyleSheet, View } from 'react-native'
+import { Alert, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native'
 import { Button, Input } from 'react-native-elements'
+import { useEffect, useState } from 'react';
 
+import Avatar from '../components/Avatar';
+import BarnIcon from '../components/icons/BarnIcon';
+import Colors from '../constants/Colors';
+import CreateFarm from '../screens/CreateFarm';
 import { Feather } from '@expo/vector-icons'
+import FieldIcon from '../components/FieldIcon';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Link } from '@react-navigation/native';
 import Login from '../screens/Login';
+import ModalScreen from '../components/Modal';
 import StackRoutes from './stack.routes';
 import TabRoutes from './tab.routes'
+import { TapGestureHandler } from 'react-native-gesture-handler';
 import { createDrawerNavigator } from '@react-navigation/drawer'
+import { isActiveModelAtom } from '../atoms/activeModelAtom';
 import { supabase } from '../lib/supabase'
+import { useAtom } from 'jotai';
 
 const Drawer = createDrawerNavigator();
 
+function TabBarIcon(props: {
+    name: React.ComponentProps<typeof FontAwesome>['name'];
+    color: string;
+}) {
+    return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+}
+
+
 export default function DrawerRoutes() {
+    const colorScheme = useColorScheme();
+    const [isActiveModel, setIsActiveModel] = useAtom(isActiveModelAtom); // Estado local para controlar a visibilidade do modal
+
+    const openModal = () => {
+        setIsActiveModel(true);
+        console.log('====================================');
+        console.log('Modal aberto');
+        console.log('====================================');
+    };
+
     return (
         // O Drawer.Screen é responsável por definir as rotas do drawer, que é o menu lateral da aplicação
         // Nesse caso não tem como deixar o headerShown: false, pois irá ocultar o icone para abrir o drawer
         // Dessa forma, para tirar a escrita, devemos deixar o title como null, ai só vai aparecer o icone para abrir o drawer
-        <Drawer.Navigator screenOptions={{ title: '' }}>
+        <Drawer.Navigator screenOptions={{
+            drawerIcon: ({ color, size }) => {
+                return <Feather name='activity' size={size} color={color} />
+            },
+            headerTitleAlign: 'center',
+            drawerStatusBarAnimation: 'fade',
+            drawerStyle: {
+                paddingTop: 20,
+            },
+
+
+        }}>
             <Drawer.Screen
                 name='Home'
                 component={TabRoutes} // Nesse caso, estamos chamando o TabRoutes, que é o arquivo que contém as rotas das tabs, ao invés de renderizar uma nova interface,
@@ -24,10 +65,36 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => {
                         return <Feather name='home' size={size} color={color} />
                     },
-                    drawerLabel: 'Inicio'
+                    drawerLabel: 'Inicio',
+                    headerTitle: () => (
+                        <TouchableOpacity onPress={openModal} style={styles.openModal}>
+                            <Text>Clique para alterar a fazenda selecionada</Text>
+                            <BarnIcon />
+                        </TouchableOpacity>
+                    )
+                }}
+            />
+            <Drawer.Screen
+                name='CreateFarm'
+                component={CreateFarm}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name='plus' size={size} color={color} />
+                    ),
+                    drawerLabel: 'Create Farm',
                 }}
             />
 
+            <Drawer.Screen
+                name='EditFarm'
+                component={CreateFarm}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name='plus' size={size} color={color} />
+                    ),
+                    drawerLabel: 'Edit Farm',
+                }}
+            />
             <Drawer.Screen
                 name='Profile'
                 component={StackRoutes} // Nesse caso, estamos chamando o StackRoutes, que é o arquivo que contém as rotas das stacks,
@@ -38,6 +105,7 @@ export default function DrawerRoutes() {
                     },
                     drawerLabel: 'Meu Perfil'
                 }}
+
             />
             <Drawer.Screen
                 name='Logout'
@@ -59,6 +127,14 @@ export default function DrawerRoutes() {
 }
 
 const styles = StyleSheet.create({
+    openModal: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#fff',
+        width: 305,
+        left: -10,
+    },
     container: {
         marginTop: 40,
         padding: 12,
@@ -70,5 +146,45 @@ const styles = StyleSheet.create({
     },
     mt20: {
         marginTop: 20,
+    },
+    modalFather: {
+        width: '100%',
+        height: '100%',
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fundo escurecido
+        justifyContent: 'center',
+        alignItems: 'center',
+
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        width: '80%',
+        borderRadius: 10,
+        padding: 20,
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
+    closeButton: {
+        padding: 8,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    },
+    content: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#333',
     },
 })
