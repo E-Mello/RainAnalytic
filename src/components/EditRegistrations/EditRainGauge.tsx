@@ -1,13 +1,13 @@
 import { Button, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 
-import { FarmCreateSchema } from '../types/FazendaTypes'
+import { FarmCreateSchema } from '../../types/FazendaTypes'
 import React from 'react';
-import styles from '../types/CreateFarmTypes';
-import { supabase } from '../lib/supabase';
+import styles from '../../styles/styleRegisterFarm';
+import { supabase } from '../../lib/supabase';
 import { zodResolver } from "@hookform/resolvers/zod";
 
-export default function FarmCreationScreen() {
+export default function RainGaugeEdit() {
     const {
         control,
         handleSubmit,

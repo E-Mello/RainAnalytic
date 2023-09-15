@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import Avatar from '../components/Avatar';
 import BarnIcon from '../components/icons/BarnIcon';
 import Colors from '../constants/Colors';
-import CreateFarm from '../screens/CreateFarm';
+import CreateFarm from '../screens/ManageRegistrations';
+import EditRecords from '../screens/EditRecords';
 import { Feather } from '@expo/vector-icons'
 import FieldIcon from '../components/FieldIcon';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -81,18 +82,18 @@ export default function DrawerRoutes() {
                     drawerIcon: ({ color, size }) => (
                         <Feather name='plus' size={size} color={color} />
                     ),
-                    drawerLabel: 'Create Farm',
+                    drawerLabel: 'Gerenciar Cadastros',
                 }}
             />
 
             <Drawer.Screen
                 name='EditFarm'
-                component={CreateFarm}
+                component={EditRecords}
                 options={{
                     drawerIcon: ({ color, size }) => (
                         <Feather name='plus' size={size} color={color} />
                     ),
-                    drawerLabel: 'Edit Farm',
+                    drawerLabel: 'Editar Registros',
                 }}
             />
             <Drawer.Screen
