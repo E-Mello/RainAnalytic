@@ -49,7 +49,7 @@ export default function RainData() {
     // Convert selectedYear to a number
     const yearAsNumber: number = parseInt(selectedYear, 10);
 
-    // Now you can perform arithmetic operations on yearAsNumber
+    // Dessa forma da pra fazer operações matemáticas com o ano selecionado
     const nextYear: number = yearAsNumber + 1;
 
     useEffect(() => {

@@ -21,7 +21,7 @@ export default function Profile() {
     const [phone, setPhone] = useState('');
 
     useEffect(() => {
-        // Atualize o estado com os dados do usuário da sessão
+        // Atualizar o estado com os dados do usuário da sessão
         if (user) {
             setUsername(user.user_metadata?.username || '');
             setWebsite(user.user_metadata?.website || '');
@@ -70,7 +70,7 @@ export default function Profile() {
             setLoading(true);
             if (!user) throw new Error('No user on the session!');
 
-            // Busque os valores atuais dos campos do estado profileData
+            // Buscar os valores atuais dos campos do estado profileData
             const currentUsername = profileData?.username || '';
             const currentFullName = profileData?.full_name || '';
             const currentWebsite = profileData?.website || '';
@@ -79,11 +79,11 @@ export default function Profile() {
 
             const updates = {
                 id: user.id,
-                username: username || currentUsername, // Use o valor alterado ou o valor atual
-                full_name: fullName || currentFullName, // Use o valor alterado ou o valor atual
-                email: email || currentEmail, // Use o valor alterado ou o valor atual
-                phone: phone || currentPhone, // Use o valor alterado ou o valor atual
-                website: website || currentWebsite, // Use o valor alterado ou o valor atual
+                username: username || currentUsername, // Usar o valor alterado ou o valor atual (Cambiarra para não dar erro de campo vazio)
+                full_name: fullName || currentFullName, // Usar o valor alterado ou o valor atual (Cambiarra para não dar erro de campo vazio)
+                email: email || currentEmail, // Usar o valor alterado ou o valor atual (Cambiarra para não dar erro de campo vazio)
+                phone: phone || currentPhone, // Usar o valor alterado ou o valor atual (Cambiarra para não dar erro de campo vazio)
+                website: website || currentWebsite, // Usar o valor alterado ou o valor atual (Cambiarra para não dar erro de campo vazio)
                 avatar_url: profileData?.avatar_url,
                 updated_at: new Date(),
             };
@@ -94,7 +94,7 @@ export default function Profile() {
                 throw error;
             }
 
-            // Atualize profileData com os novos dados
+            // Atualizar profileData com os novos dados
             setProfileData((prevProfileData) => ({
                 ...prevProfileData!,
                 username: updates.username,

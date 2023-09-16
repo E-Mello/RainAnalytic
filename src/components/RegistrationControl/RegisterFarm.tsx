@@ -9,8 +9,8 @@ import { supabase } from '../../lib/supabase';
 
 export default function FarmRegister() {
     const [toastVisible, setToastVisible] = useState(false);
-    const [toastMessage, setToastMessage] = useState(''); // Armazena a mensagem do Toast
-    const [toastType, setToastType] = useState<undefined | 'info' | 'error' | 'success'>(undefined); // Armazena o tipo do Toast
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState<undefined | 'info' | 'error' | 'success'>(undefined);
 
     const showCustomToast = (message: string, type?: 'info' | 'error' | 'success') => {
         setToastMessage(message);
@@ -18,14 +18,15 @@ export default function FarmRegister() {
 
         setTimeout(() => {
             setToastVisible(false);
-        }, 3000); // Esconde o Toast após 3 segundos
+        }, 3000);
 
-        setToastType(type); // Define o tipo do Toast com base no argumento recebido
+        setToastType(type);
     };
 
     const {
         control,
         handleSubmit,
+        reset, // Adicionado o reset do useForm
         formState: { errors, isValid },
     } = useForm({ mode: 'onBlur' });
 
@@ -51,6 +52,7 @@ export default function FarmRegister() {
                     showCustomToast('Erro ao inserir a fazenda: ' + error.message, 'error');
                 } else {
                     console.log('Fazenda inserida com sucesso:', insertedFarm);
+                    reset(); // Redefine o formulário após a submissão bem-sucedida
                 }
             }
         } catch (error) {
@@ -58,7 +60,6 @@ export default function FarmRegister() {
             showCustomToast('Erro ao registrar a fazenda: ', 'error');
         }
     };
-
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.label}>Nome da Fazenda:</Text>
@@ -81,7 +82,6 @@ export default function FarmRegister() {
 
             <Button title="Criar Fazenda" onPress={handleSubmit(onSubmit)} />
 
-            {/* Renderize o ToastMessage na parte superior do componente */}
             <View style={{ top: -180, width: '100%' }}>
                 {toastVisible && (
                     <CustomToast

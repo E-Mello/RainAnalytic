@@ -3,7 +3,7 @@ import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import React from 'react';
 import RegisterFarm from '../components/RegistrationControl/RegisterFarm';
 import RegisterField from '../components/RegistrationControl/RegisterField';
-import RegisterRainGauge from '../components/RegistrationControl/RegisterRainGauge';
+import RegisterRainGauge from '../components/RegistrationControl/RegisterPluviometer';
 
 export default function ManageRegistrations() {
     return (

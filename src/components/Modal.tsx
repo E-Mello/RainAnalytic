@@ -9,9 +9,9 @@ import { useAtom } from 'jotai';
 
 export default function ModalScreen() {
     const [isActiveModel, setIsActiveModel] = useAtom(isActiveModelAtom);
-    const [selectedFazenda, setSelectedFazenda] = useState('Fazenda A'); // Defina a fazenda pré-selecionada
-    const [selectedTalhao, setSelectedTalhao] = useState('Talhão 1'); // Defina o talhão pré-selecionado
-    const [selectedPluviometro, setSelectedPluviometro] = useState('Pluviômetro 1'); // Defina o pluviômetro pré-selecionado
+    const [selectedFazenda, setSelectedFazenda] = useState('Fazenda A'); // Define a fazenda pré-selecionada
+    const [selectedTalhao, setSelectedTalhao] = useState('Talhão 1'); // Define o talhão pré-selecionado
+    const [selectedPluviometro, setSelectedPluviometro] = useState('Pluviômetro 1'); // Define o pluviômetro pré-selecionado
 
     const closeModal = () => {
         setIsActiveModel(false);
