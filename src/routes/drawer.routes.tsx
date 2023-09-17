@@ -13,6 +13,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link } from '@react-navigation/native';
 import Login from '../screens/Login';
 import ModalScreen from '../components/Modal';
+import Report from '../screens/Reports';
 import StackRoutes from './stack.routes';
 import TabRoutes from './tab.routes'
 import { TapGestureHandler } from 'react-native-gesture-handler';
@@ -91,9 +92,20 @@ export default function DrawerRoutes() {
                 component={EditRecords}
                 options={{
                     drawerIcon: ({ color, size }) => (
-                        <Feather name='plus' size={size} color={color} />
+                        <Feather name='edit' size={size} color={color} />
                     ),
                     drawerLabel: 'Editar Registros',
+                }}
+            />
+
+            <Drawer.Screen
+                name='Reports'
+                component={Report}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name='printer' size={size} color={color} />
+                    ),
+                    drawerLabel: 'Relatórios',
                 }}
             />
             <Drawer.Screen

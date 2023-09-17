@@ -3,6 +3,7 @@ import { SafeAreaView, ScrollView, Text, View } from 'react-native';
 import React from 'react';
 import RegisterFarm from '../components/RegistrationControl/RegisterFarm';
 import RegisterField from '../components/RegistrationControl/RegisterField';
+import RegisterPrecipitation from '../components/RegistrationControl/RecordPrecipitation';
 import RegisterRainGauge from '../components/RegistrationControl/RegisterPluviometer';
 
 export default function ManageRegistrations() {
@@ -21,6 +22,9 @@ export default function ManageRegistrations() {
 
                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 16 }}>Registro de Pluviômetro</Text>
                 <RegisterRainGauge />
+
+                <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 16 }}>Registro de Precipitação</Text>
+                <RegisterPrecipitation />
             </ScrollView>
         </SafeAreaView>
     );
