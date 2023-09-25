@@ -36,6 +36,20 @@ export default function CustomDatePicker({
 
     const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
+    // Estados separados para as datas de início e fim
+    const [tempStartDay, setTempStartDay] = useState<number | null>(startDate.getDate());
+    const [tempStartMonth, setTempStartMonth] = useState<number | null>(startDate.getMonth() + 1);
+    const [tempStartYear, setTempStartYear] = useState<number | null>(startDate.getFullYear());
+
+    const [tempEndDay, setTempEndDay] = useState<number | null>(endDate?.getDate() || null);
+    const [tempEndMonth, setTempEndMonth] = useState<number | null>(
+        endDate?.getMonth() ? endDate?.getMonth() + 1 : null
+    );
+    const [tempEndYear, setTempEndYear] = useState<number | null>(
+        endDate?.getFullYear() || null
+    );
+
+
     const showCustomToast = (message: string, type?: 'info' | 'error' | 'success') => {
         setToastMessage(message);
         setToastVisible(true);
@@ -47,14 +61,53 @@ export default function CustomDatePicker({
         setToastType(type);
     };
 
-    // Modifique a função handleConfirm para aplicar a seleção temporária ao estado real e fechar o Picker.
-    const handleConfirm = () => {
-        setSelectedDay(tempSelectedDay);
-        setSelectedMonth(tempSelectedMonth);
-        setSelectedYear(tempSelectedYear);
-        setIsDatePickerVisible(false);
-        onClose();
+    // Função para validar se a data de fim é maior do que a data de início
+    const isEndDateValid = (
+        startDay: number,
+        startMonth: number,
+        startYear: number,
+        endDay: number,
+        endMonth: number,
+        endYear: number
+    ) => {
+        const startDateObj = new Date(startYear, startMonth - 1, startDay);
+        const endDateObj = new Date(endYear, endMonth - 1, endDay);
+
+        return endDateObj >= startDateObj;
     };
+
+    // Modificar a função handleConfirm para aplicar a seleção temporária às datas de início e fim
+    const handleConfirm = () => {
+        if (
+            tempStartDay === null ||
+            tempStartMonth === null ||
+            tempStartYear === null ||
+            tempEndDay === null ||
+            tempEndMonth === null ||
+            tempEndYear === null
+        ) {
+            showCustomToast('Preencha todos os campos de data', 'info');
+        } else if (
+            !isEndDateValid(
+                tempStartDay,
+                tempStartMonth,
+                tempStartYear,
+                tempEndDay,
+                tempEndMonth,
+                tempEndYear
+            )
+        ) {
+            showCustomToast('A data de início deve ser menor ou igual à data de fim', 'info');
+        } else {
+            // Aplicar a seleção temporária às datas de início e fim
+            setStartDate(new Date(tempStartYear, tempStartMonth - 1, tempStartDay));
+            setEndDate(new Date(tempEndYear, tempEndMonth - 1, tempEndDay));
+
+            setIsDatePickerVisible(false);
+            onClose();
+        }
+    };
+
 
     const [selectedDay, setSelectedDay] = useState(startDate.getDate());
     const [selectedMonth, setSelectedMonth] = useState(startDate.getMonth() + 1);
@@ -62,10 +115,9 @@ export default function CustomDatePicker({
     const [activeDatePicker, setActiveDatePicker] = useState<'day' | 'month' | 'year'>('day');
 
     // Dentro do seu componente CustomDatePicker, adicione um novo estado temporário para a seleção do Picker.
-    const [tempSelectedDay, setTempSelectedDay] = useState(selectedDay);
-    const [tempSelectedMonth, setTempSelectedMonth] = useState(selectedMonth);
-    const [tempSelectedYear, setTempSelectedYear] = useState(selectedYear);
-
+    const [tempSelectedDay, setTempSelectedDay] = useState<number | null>(selectedDay);
+    const [tempSelectedMonth, setTempSelectedMonth] = useState<number | null>(selectedMonth);
+    const [tempSelectedYear, setTempSelectedYear] = useState<number | null>(selectedYear);
 
     // Função para obter os dias disponíveis com base no mês e ano atual
     const getAvailableDays = () => {
@@ -122,18 +174,16 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={2}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text) || parseInt(text) < 1 || parseInt(text) > 31) {
-                                            showCustomToast('Digite um dia válido (1-31)', 'info');
+                                        if (text === '') {
+                                            setTempStartDay(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setDate(parseInt(text));
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempStartDay(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={startDate.getDate().toString()}
+                                    value={tempStartDay !== null ? tempStartDay.toString() : ''}
                                 />
+
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('day')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
                                 </TouchableOpacity>
@@ -150,18 +200,17 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={2}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text) || parseInt(text) < 1 || parseInt(text) > 12) {
-                                            showCustomToast('Digite um mês válido (1-12)', 'info');
+                                        if (text === '') {
+                                            // Campo vazio, definir como null
+                                            setTempStartMonth(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setMonth(parseInt(text) - 1);
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempStartMonth(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={(startDate.getMonth() + 1).toString().padStart(2, '0')}
+                                    value={tempSelectedMonth !== null ? tempSelectedMonth.toString() : ''}
                                 />
+
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('month')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
                                 </TouchableOpacity>
@@ -178,17 +227,15 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={4}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text)) {
-                                            showCustomToast('Digite um ano válido', 'info');
+                                        if (text === '') {
+                                            // Campo vazio, definir como null
+                                            setTempStartYear(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setFullYear(parseInt(text));
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempStartYear(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={startDate.getFullYear().toString()}
+                                    value={tempSelectedYear !== null ? tempSelectedYear.toString() : ''}
                                 />
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('year')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
@@ -210,17 +257,15 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={2}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text) || parseInt(text) < 1 || parseInt(text) > 31) {
-                                            showCustomToast('Digite um dia válido (1-31)', 'info');
+                                        if (text === '') {
+                                            // Campo vazio, definir como null
+                                            setTempEndDay(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setDate(parseInt(text));
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempEndMonth(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={startDate.getDate().toString()}
+                                    value={tempSelectedDay !== null ? tempSelectedDay.toString() : ''}
                                 />
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('day')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
@@ -238,18 +283,17 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={2}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text) || parseInt(text) < 1 || parseInt(text) > 12) {
-                                            showCustomToast('Digite um mês válido (1-12)', 'info');
+                                        if (text === '') {
+                                            // Campo vazio, definir como null
+                                            setTempEndMonth(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setMonth(parseInt(text) - 1);
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempEndMonth(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={(startDate.getMonth() + 1).toString().padStart(2, '0')}
+                                    value={tempSelectedMonth !== null ? tempSelectedMonth.toString() : ''}
                                 />
+
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('month')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
                                 </TouchableOpacity>
@@ -266,17 +310,15 @@ export default function CustomDatePicker({
                                     keyboardType="number-pad"
                                     maxLength={4}
                                     onChangeText={(text) => {
-                                        if (!/^\d+$/.test(text)) {
-                                            showCustomToast('Digite um ano válido', 'info');
+                                        if (text === '') {
+                                            // Campo vazio, definir como null
+                                            setTempEndYear(null);
                                         } else {
-                                            setStartDate((prevDate) => {
-                                                const newDate = prevDate ? new Date(prevDate) : new Date();
-                                                newDate.setFullYear(parseInt(text));
-                                                return newDate;
-                                            });
+                                            const parsedValue = parseInt(text);
+                                            setTempEndDay(isNaN(parsedValue) ? null : parsedValue);
                                         }
                                     }}
-                                    value={startDate.getFullYear().toString()}
+                                    value={tempSelectedYear !== null ? tempSelectedYear.toString() : ''}
                                 />
                                 <TouchableOpacity style={styles.dateInputIcon} onPress={() => showDatePicker('year')}>
                                     <Text style={styles.dateSelectionButton}>📅</Text>
