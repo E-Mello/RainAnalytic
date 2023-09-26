@@ -1,7 +1,13 @@
 import { Modal, Text, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 
-export default function ReportFormatModal({ isVisible, onClose, onGenerate }) {
+type ReportFormatModalProps = {
+  isVisible: boolean;
+  onClose: () => void;
+  onGenerate: (format: string) => void;
+};
+
+export default function ReportFormatModal({ isVisible, onClose, onGenerate }: ReportFormatModalProps) {
   const [selectedFormat, setSelectedFormat] = useState("pdf"); // Inicialmente selecionado como PDF
 
   const generateReport = () => {

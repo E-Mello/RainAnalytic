@@ -1,99 +1,60 @@
-import { StyleSheet } from "react-native";
+// styles.ts
+
+import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
     modalContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    datePickerContainer: {
+        margin: 25,
         backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderTopColor: '#ccc',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'black',
+        height: 400,
+        justifyContent: 'space-between',
+        top: 30,
+        
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    input: {
+        width: 200,
+        height: 40,
+        borderColor: '#ccc',
+        borderWidth: 1,
         padding: 10,
     },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 16,
-    },
-    modalSubTitle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        marginBottom: 16,
-    },
-    dateSelectionContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
-    },
-    dateInputContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginRight: 16,
-    },
-    dateInputLabel: {
-        marginRight: 8,
-    },
-    dateInputAndIcon: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: 55,
-    },
-    dateInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        paddingVertical: 5,
-        width: 55,
-        textAlign: 'center',
-    },
-    dateInputIcon: {
+    calendarIcon: {
         marginLeft: 5,
-    },
-    dateSelectionButton: {
-        fontSize: 18,
     },
     buttonContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 16,
-        backgroundColor: 'white',
-        borderTopWidth: 1,
-        borderTopColor: '#ccc',
+        justifyContent: 'center',
+        marginTop: 16,
+    },
+    button: {
+        backgroundColor: 'blue', // Defina a cor desejada aqui
+        padding: 10,
+        borderRadius: 5,
+        marginRight: 10,
     },
     buttonText: {
         fontSize: 18,
-        color: 'blue',
+        color: 'white',
+        textAlign: 'center',
     },
-    datePicker: {
+    calendar: {
+        width: 300,
+        height: 300,
         backgroundColor: 'white',
-        padding: 20,
-        borderTopWidth: 1,
-        borderTopColor: '#ccc',
-      },
-      datePickerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-      },
-      picker: {
-        height: 50,
-      },
-      cancelButton: {
-        backgroundColor: 'red',
-        padding: 10,
-        borderRadius: 5,
+        borderRadius: 20,
+        borderWidth: 1,
+        zIndex: 1000,
         flex: 1,
-        marginRight: 10,
-      },
-      confirmButton: {
-        backgroundColor: 'green',
-        padding: 10,
-        borderRadius: 5,
-        flex: 1,
-      },
+    }
 });
 
 export default styles;
