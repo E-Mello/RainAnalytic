@@ -9,7 +9,7 @@ import {
 import React, { useState } from 'react';
 
 import { Calendar } from 'react-native-calendars';
-import CustomToast from './CustomToast';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import styles from './../styles/styleCustomDatePicker'; // Importe os estilos externos
 
 interface CustomDatePickerProps {
@@ -19,23 +19,15 @@ interface CustomDatePickerProps {
     onDateChange: (startDate: Date | null, endDate: Date | null) => void;
 }
 
-
 export default function CustomDatePicker({
     visible,
     selectedDate,
     onClose,
     onDateChange,
 }: CustomDatePickerProps) {
-    const currentDate = new Date(); // Get the current date
+    const currentDate = new Date(); // Obtenha a data atual
 
-    // Initialize startDate and endDate with the current date initially
-    const [startDate, setStartDate] = useState(selectedDate || currentDate);
-    const [endDate, setEndDate] = useState(selectedDate || currentDate);
-
-    const [showStartCalendar, setShowStartCalendar] = useState(false); // Separate state for the start date calendar
-    const [showEndCalendar, setShowEndCalendar] = useState(false); // Separate state for the end date calendar
-
-    // Helper function to format the date as DD/MM/YYYY
+    // Função auxiliar para formatar a data como DD/MM/YYYY
     const formatDate = (date: Date) => {
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -43,52 +35,81 @@ export default function CustomDatePicker({
         return `${day}/${month}/${year}`;
     };
 
-    const handleDateInputChange = (
-        text: string,
-        setDateFunction: { (value: React.SetStateAction<Date>): void }
-    ) => {
-        const dateParts = text.split('/');
+    // Inicialize startDate e endDate com a data atual inicialmente
+    const [startDateText, setStartDateText] = useState(
+        selectedDate ? formatDate(selectedDate) : ''
+    );
+    const [endDateText, setEndDateText] = useState(
+        selectedDate ? formatDate(selectedDate) : ''
+    );
 
-        if (dateParts.length === 3) {
-            const day = parseInt(dateParts[0]);
-            const month = parseInt(dateParts[1]) - 1;
-            const year = parseInt(dateParts[2]);
-
-            // Check if the entered date is valid and not in the future
-            if (!isNaN(day) && !isNaN(month) && !isNaN(year) && year >= 1000) {
-                const newDate = new Date(year, month, day);
-                setDateFunction(newDate);
-            }
-        } else {
-            // If the input does not contain 3 parts (DD/MM/YYYY), do not update the date
-        }
-    };
+    const [showStartCalendar, setShowStartCalendar] = useState(false);
+    const [showEndCalendar, setShowEndCalendar] = useState(false);
 
     const handleConfirm = () => {
+        const startDateArray = startDateText.split('/');
+        const endDateArray = endDateText.split('/');
+
+        const startDate = new Date(
+            parseInt(startDateArray[2]),
+            parseInt(startDateArray[1]) - 1,
+            parseInt(startDateArray[0])
+        );
+
+        const endDate = new Date(
+            parseInt(endDateArray[2]),
+            parseInt(endDateArray[1]) - 1,
+            parseInt(endDateArray[0])
+        );
+
         setShowStartCalendar(false);
         setShowEndCalendar(false);
         onDateChange(startDate, endDate);
         onClose();
     };
 
+    // Função para formatar o texto de entrada com barras
+    const formatInputText = (text: string) => {
+        // Remova caracteres não numéricos
+        const numericText = text.replace(/[^0-9/]/g, '');
+
+        if (numericText.length <= 2) {
+            // Formate DD
+            return numericText;
+        } else if (numericText.length <= 4) {
+            // Formate DD/MM
+            return `${numericText.substr(0, 2)}/${numericText.substr(2)}`;
+        } else {
+            // Formate DD/MM/YYYY
+            return `${numericText.substr(0, 2)}/${numericText.substr(2, 2)}/${numericText.substr(4, 4)}`;
+        }
+    };
+
     return (
         <Modal visible={visible} transparent={true} animationType="slide">
             <View style={styles.modalContainer}>
-                {/* Content above the start date input */}
-                <View>
-                    <Button title="Fechar" onPress={onClose} />
-                    <Text>Selecione a Data de Início:</Text>
+                {/* Header Modal */}
+                <View style={styles.headerView}>
+                    <TouchableOpacity style={styles.closeIconContainer} onPress={onClose}>
+                        <Text>
+                            <FontAwesome5 name="times" style={styles.closeIcon} />
+                        </Text>
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>
+                        Digite a data ou selecione no calendário
+                    </Text>
                 </View>
-
                 {/* Start Date Input */}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
                         placeholder="DD/MM/AAAA"
-                        value={startDate ? formatDate(startDate) : ''}
+                        value={startDateText}
                         onChangeText={(text) => {
-                            handleDateInputChange(text, setStartDate);
+                            const formattedText = formatInputText(text);
+                            setStartDateText(formattedText);
                         }}
+                        keyboardType="numeric" // Permita apenas o teclado numérico
                     />
 
                     <TouchableOpacity onPress={() => setShowStartCalendar(true)}>
@@ -96,62 +117,53 @@ export default function CustomDatePicker({
                     </TouchableOpacity>
                 </View>
                 {showStartCalendar && (
-                    <Calendar
-                        style={styles.calendar} // Apply styles here
-                        current={startDate.toISOString().split('T')[0]}
-                        onDayPress={(day) => {
-                            const dateParts = day.dateString.split('-');
-                            const year = parseInt(dateParts[0]);
-                            const month = parseInt(dateParts[1]) - 1;
-                            const dayOfMonth = parseInt(dateParts[2]);
-                            const newDate = new Date(year, month, dayOfMonth);
-                            setStartDate(newDate);
-                            setShowStartCalendar(false);
-                        }}
-                    />
+                    <View style={styles.calendarView}>
+                        <Calendar
+                            style={styles.calendar}
+                            current={startDateText}
+                            onDayPress={(day) => {
+                                setStartDateText(day.dateString);
+                                setShowStartCalendar(false);
+                            }}
+                        />
+                    </View>
                 )}
-
-                {/* Content between start and end date inputs */}
-                <View>
-                    {/* Add any content you want between the date inputs here */}
-                </View>
 
                 {/* End Date Input */}
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
                         placeholder="DD/MM/AAAA"
-                        value={endDate ? formatDate(endDate) : ''}
+                        value={endDateText}
                         onChangeText={(text) => {
-                            handleDateInputChange(text, setEndDate);
+                            const formattedText = formatInputText(text);
+                            setEndDateText(formattedText);
                         }}
+                        keyboardType="numeric" // Permita apenas o teclado numérico
                     />
                     <TouchableOpacity onPress={() => setShowEndCalendar(true)}>
                         <Text style={styles.calendarIcon}>📅</Text>
                     </TouchableOpacity>
                 </View>
                 {showEndCalendar && (
-                    <Calendar
-                        style={styles.calendar} // Apply styles here
-                        current={endDate.toISOString().split('T')[0]}
-                        onDayPress={(day) => {
-                            const dateParts = day.dateString.split('-');
-                            const year = parseInt(dateParts[0]);
-                            const month = parseInt(dateParts[1]) - 1;
-                            const dayOfMonth = parseInt(dateParts[2]);
-                            const newDate = new Date(year, month, dayOfMonth);
-                            setEndDate(newDate);
-                            setShowEndCalendar(false);
-                        }}
-                    />
+                    <View style={styles.calendarView}>
+                        <Calendar
+                            style={styles.calendar}
+                            current={endDateText}
+                            onDayPress={(day) => {
+                                setEndDateText(day.dateString);
+                                setShowEndCalendar(false);
+                            }}
+                        />
+                    </View>
                 )}
 
-                {/* Content below the end date input */}
+                {/* Conteúdo abaixo da entrada de data de término */}
                 <View style={styles.buttonContainer}>
                     <Button
                         title="Confirmar"
                         onPress={handleConfirm}
-                        color={styles.button.backgroundColor} // Use the color defined in your style
+                        color={styles.button.backgroundColor} // Use a cor definida em seu estilo
                     />
                 </View>
             </View>
