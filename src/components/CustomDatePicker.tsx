@@ -1,16 +1,11 @@
-import {
-    Button,
-    Modal,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
-import React, { useState } from 'react';
+import { Button, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { endDateAtom, startDateAtom } from '../atoms/dateForReports';
 
 import { Calendar } from 'react-native-calendars';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import styles from './../styles/styleCustomDatePicker'; // Importe os estilos externos
+import { useAtom } from 'jotai';
 
 interface CustomDatePickerProps {
     visible: boolean;
@@ -35,6 +30,15 @@ export default function CustomDatePicker({
         return `${day}/${month}/${year}`;
     };
 
+    const [isStartDate, setIsStartDate] = useAtom(startDateAtom);
+    const [isEndDate, setIsEndDate] = useAtom(endDateAtom);
+
+    // Inicialize o estado interno do Calendar com a data atual no formato YYYY-MM-DD
+    const [calendarDate, setCalendarDate] = useState(
+        selectedDate ? formatDate(selectedDate) : currentDate.toISOString().slice(0, 10)
+    );
+
+
     // Inicialize startDate e endDate com a data atual inicialmente
     const [startDateText, setStartDateText] = useState(
         selectedDate ? formatDate(selectedDate) : ''
@@ -45,6 +49,14 @@ export default function CustomDatePicker({
 
     const [showStartCalendar, setShowStartCalendar] = useState(false);
     const [showEndCalendar, setShowEndCalendar] = useState(false);
+
+    useEffect(() => {
+        // Se o `selectedDate` mudar externamente, atualize os campos de texto
+        if (selectedDate) {
+            setStartDateText(formatDate(selectedDate));
+            setEndDateText(formatDate(selectedDate));
+        }
+    }, [selectedDate]);
 
     const handleConfirm = () => {
         const startDateArray = startDateText.split('/');
@@ -62,17 +74,29 @@ export default function CustomDatePicker({
             parseInt(endDateArray[0])
         );
 
+        // Atualize os estados globais com as datas selecionadas
+        setIsStartDate(startDate);
+        setIsEndDate(endDate);
+
         setShowStartCalendar(false);
         setShowEndCalendar(false);
         onDateChange(startDate, endDate);
         onClose();
     };
 
-    // Função para formatar o texto de entrada com barras
+
+    // Função para formatar a data como DD-MM-YYYY
+    const formatToDDMMYYYY = (date: string) => {
+        const [year, month, day] = date.split('-');
+        return `${day}-${month}-${year}`;
+    };
+
+    // Função para formatar o texto de entrada com barras e limitar a 10 caracteres
     const formatInputText = (text: string) => {
         // Remova caracteres não numéricos
-        const numericText = text.replace(/[^0-9/]/g, '');
+        const numericText = text.replace(/[^0-9]/g, '');
 
+        // Adicione as barras automaticamente
         if (numericText.length <= 2) {
             // Formate DD
             return numericText;
@@ -81,7 +105,7 @@ export default function CustomDatePicker({
             return `${numericText.substr(0, 2)}/${numericText.substr(2)}`;
         } else {
             // Formate DD/MM/YYYY
-            return `${numericText.substr(0, 2)}/${numericText.substr(2, 2)}/${numericText.substr(4, 4)}`;
+            return `${numericText.substr(0, 2)}/${numericText.substr(2, 2)}/${numericText.substr(4, 4)}`.substring(0, 10);
         }
     };
 
@@ -101,17 +125,19 @@ export default function CustomDatePicker({
                 </View>
                 {/* Start Date Input */}
                 <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="DD/MM/AAAA"
-                        value={startDateText}
-                        onChangeText={(text) => {
-                            const formattedText = formatInputText(text);
-                            setStartDateText(formattedText);
-                        }}
-                        keyboardType="numeric" // Permita apenas o teclado numérico
-                    />
-
+                    <View style={styles.viewTextInputContainer}>
+                        <Text>Data Inicio: </Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="DD-MM-YYYY"
+                            value={startDateText}
+                            onChangeText={(text) => {
+                                const formattedText = formatInputText(text);
+                                setStartDateText(formattedText);
+                            }}
+                            keyboardType="numeric"
+                        />
+                    </View>
                     <TouchableOpacity onPress={() => setShowStartCalendar(true)}>
                         <Text style={styles.calendarIcon}>📅</Text>
                     </TouchableOpacity>
@@ -120,27 +146,33 @@ export default function CustomDatePicker({
                     <View style={styles.calendarView}>
                         <Calendar
                             style={styles.calendar}
-                            current={startDateText}
+                            current={calendarDate}
                             onDayPress={(day) => {
-                                setStartDateText(day.dateString);
+                                setCalendarDate(day.dateString); // Mantenha o formato YYYY-MM-DD
                                 setShowStartCalendar(false);
+                                // Atualize o estado interno dos campos de entrada com o formato DD-MM-YYYY
+                                setStartDateText(formatToDDMMYYYY(day.dateString));
                             }}
                         />
+
                     </View>
                 )}
 
                 {/* End Date Input */}
                 <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="DD/MM/AAAA"
-                        value={endDateText}
-                        onChangeText={(text) => {
-                            const formattedText = formatInputText(text);
-                            setEndDateText(formattedText);
-                        }}
-                        keyboardType="numeric" // Permita apenas o teclado numérico
-                    />
+                    <View style={styles.viewTextInputContainer}>
+                        <Text>Data Fim: </Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="DD-MM-YYYY"
+                            value={endDateText}
+                            onChangeText={(text) => {
+                                const formattedText = formatInputText(text);
+                                setEndDateText(formattedText);
+                            }}
+                            keyboardType="numeric"
+                        />
+                    </View>
                     <TouchableOpacity onPress={() => setShowEndCalendar(true)}>
                         <Text style={styles.calendarIcon}>📅</Text>
                     </TouchableOpacity>
@@ -149,10 +181,12 @@ export default function CustomDatePicker({
                     <View style={styles.calendarView}>
                         <Calendar
                             style={styles.calendar}
-                            current={endDateText}
+                            current={calendarDate}
                             onDayPress={(day) => {
-                                setEndDateText(day.dateString);
+                                setCalendarDate(day.dateString); // Mantenha o formato YYYY-MM-DD
                                 setShowEndCalendar(false);
+                                // Atualize o estado interno dos campos de entrada com o formato DD-MM-YYYY
+                                setEndDateText(formatToDDMMYYYY(day.dateString));
                             }}
                         />
                     </View>

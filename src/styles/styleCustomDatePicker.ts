@@ -47,6 +47,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 10,
     },
+    viewTextInputContainer: {
+        flexDirection: 'column',
+        paddingBottom: 10,
+        gap: 5,
+    },
+    textInput: {
+    },
     input: {
         width: 250,
         height: 50,
