@@ -1,10 +1,10 @@
 import { Button, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { endDateAtom, startDateAtom } from '../atoms/dateForReports';
+import { endDateAtom, startDateAtom } from '../../atoms/reportAtoms';
 
 import { Calendar } from 'react-native-calendars';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import styles from './../styles/styleCustomDatePicker'; // Importe os estilos externos
+import styles from '../../styles/styleCustomDatePicker'; // Importe os estilos externos
 import { useAtom } from 'jotai';
 
 interface CustomDatePickerProps {
@@ -29,17 +29,16 @@ export default function CustomDatePicker({
         const year = date.getFullYear();
         return `${day}/${month}/${year}`;
     };
+    const [isStartDateAtom, setIsStartDateAtom] = useAtom(startDateAtom);
+    const [isEndDateAtom, setIsEndDateAtom] = useAtom(endDateAtom);
 
-    const [isStartDate, setIsStartDate] = useAtom(startDateAtom);
-    const [isEndDate, setIsEndDate] = useAtom(endDateAtom);
-
-    // Inicialize o estado interno do Calendar com a data atual no formato YYYY-MM-DD
+    // Inicializar o estado interno do Calendar com a data atual no formato YYYY-MM-DD
     const [calendarDate, setCalendarDate] = useState(
         selectedDate ? formatDate(selectedDate) : currentDate.toISOString().slice(0, 10)
     );
 
 
-    // Inicialize startDate e endDate com a data atual inicialmente
+    // Inicializar startDate e endDate com a data atual inicialmente
     const [startDateText, setStartDateText] = useState(
         selectedDate ? formatDate(selectedDate) : ''
     );
@@ -51,7 +50,7 @@ export default function CustomDatePicker({
     const [showEndCalendar, setShowEndCalendar] = useState(false);
 
     useEffect(() => {
-        // Se o `selectedDate` mudar externamente, atualize os campos de texto
+        // Se o `selectedDate` mudar externamente, Atualizar os campos de texto
         if (selectedDate) {
             setStartDateText(formatDate(selectedDate));
             setEndDateText(formatDate(selectedDate));
@@ -74,9 +73,9 @@ export default function CustomDatePicker({
             parseInt(endDateArray[0])
         );
 
-        // Atualize os estados globais com as datas selecionadas
-        setIsStartDate(startDate);
-        setIsEndDate(endDate);
+        // Atualizar os estados globais com as datas selecionadas
+        setIsStartDateAtom(startDate);
+        setIsEndDateAtom(endDate);
 
         setShowStartCalendar(false);
         setShowEndCalendar(false);
@@ -96,7 +95,7 @@ export default function CustomDatePicker({
         // Remova caracteres não numéricos
         const numericText = text.replace(/[^0-9]/g, '');
 
-        // Adicione as barras automaticamente
+        // Adicionar as barras automaticamente
         if (numericText.length <= 2) {
             // Formate DD
             return numericText;
@@ -148,9 +147,9 @@ export default function CustomDatePicker({
                             style={styles.calendar}
                             current={calendarDate}
                             onDayPress={(day) => {
-                                setCalendarDate(day.dateString); // Mantenha o formato YYYY-MM-DD
+                                setCalendarDate(day.dateString); // Mantem o formato YYYY-MM-DD
                                 setShowStartCalendar(false);
-                                // Atualize o estado interno dos campos de entrada com o formato DD-MM-YYYY
+                                // Atualizar o estado interno dos campos de entrada com o formato DD-MM-YYYY
                                 setStartDateText(formatToDDMMYYYY(day.dateString));
                             }}
                         />
@@ -183,9 +182,9 @@ export default function CustomDatePicker({
                             style={styles.calendar}
                             current={calendarDate}
                             onDayPress={(day) => {
-                                setCalendarDate(day.dateString); // Mantenha o formato YYYY-MM-DD
+                                setCalendarDate(day.dateString); // Mantem o formato YYYY-MM-DD
                                 setShowEndCalendar(false);
-                                // Atualize o estado interno dos campos de entrada com o formato DD-MM-YYYY
+                                // Atualizar o estado interno dos campos de entrada com o formato DD-MM-YYYY
                                 setEndDateText(formatToDDMMYYYY(day.dateString));
                             }}
                         />
@@ -197,7 +196,7 @@ export default function CustomDatePicker({
                     <Button
                         title="Confirmar"
                         onPress={handleConfirm}
-                        color={styles.button.backgroundColor} // Use a cor definida em seu estilo
+                        color={styles.button.backgroundColor}
                     />
                 </View>
             </View>
