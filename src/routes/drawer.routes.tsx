@@ -1,5 +1,6 @@
 import { Alert, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View, useColorScheme } from 'react-native'
 import { Button, Input } from 'react-native-elements'
+import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from '../atoms/rainDataAtoms';
 import { useEffect, useState } from 'react';
 
 import Avatar from '../components/Avatar';
@@ -31,10 +32,12 @@ function TabBarIcon(props: {
     return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-
 export default function DrawerRoutes() {
+
+    // Others consts
     const colorScheme = useColorScheme();
     const [isActiveModel, setIsActiveModel] = useAtom(isActiveModelAtom); // Estado local para controlar a visibilidade do modal
+
 
     const openModal = () => {
         setIsActiveModel(true);

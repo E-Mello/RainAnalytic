@@ -1,5 +1,5 @@
 import { Modal, Text, TouchableOpacity, View } from 'react-native';
-import { isGeneratingReportAtom, reportFormatAtom } from '../../atoms/reportAtoms'; // Certifique-se de importar os átomos corretamente
+import { isGeneratingReportAtom, reportFormatAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom } from '../../atoms/reportAtoms'; // Certifique-se de importar os átomos corretamente
 
 import React from 'react';
 import styles from '../../styles/stylesReportModal';
@@ -8,10 +8,20 @@ import { useAtom } from 'jotai';
 const ReportModal: React.FC = () => {
     const [reportFormat, setReportFormat] = useAtom(reportFormatAtom);
     const [isModalVisible, setIsModalVisible] = useAtom(isGeneratingReportAtom);
+    const [selectedFazenda, setSelectedFazenda] = useAtom(selectedFazendaAtom);
+    const [selectedTalhao, setSelectedTalhao] = useAtom(selectedTalhaoAtom);
+    const [selectedPluviometers, setSelectedPluviometers] = useAtom(selectedPluviometerAtom);
 
     const handleFormatSelection = (format: 'pdf' | 'csv') => {
         setReportFormat(format);
+        clearAllFields();
         setIsModalVisible(!isModalVisible);
+    };
+
+    const clearAllFields = () => {
+        setSelectedFazenda(null); //clear
+        setSelectedTalhao(null); //clear
+        setSelectedPluviometers(null); //clear
     };
 
     return (

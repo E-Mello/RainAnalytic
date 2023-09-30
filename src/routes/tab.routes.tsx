@@ -5,7 +5,6 @@ import FieldIcon from '../components/FieldIcon'
 import { Icon } from 'react-native-elements'
 import ModalScreen from '../components/Modal'
 import RainData from '../screens/RainData'
-import StorageRain from '../screens/StorageRain'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createIconSet } from 'react-native-vector-icons'
 import { isActiveModelAtom } from '../atoms/activeModelAtom'
@@ -50,20 +49,7 @@ export default function TabRoutes() {
 
                     />
 
-
-                    <Tab.Screen
-                        name='new'
-                        component={StorageRain}
-                        options={{
-                            tabBarIcon: ({ color, size }) => {
-                                return <Feather name='cloud' size={size} color={color} />
-                            },
-                            tabBarLabel: 'Armazenamento da chuva'
-                        }}
-                    />
                 </Tab.Group>}
-
-
         </Tab.Navigator>
     )
 }

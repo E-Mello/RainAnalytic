@@ -1,50 +1,52 @@
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
+import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from "../atoms/rainDataAtoms";
 
 import BarChartComponent from "../components/BarChartComponent";
 import BezierLineChart from "../components/BezierLineChart";
+import CustomToast from '../components/CustomToast';
 import PieChartComponent from "../components/LineChartComponent";
 import { User } from '@supabase/supabase-js';
 import styles from "../styles/styleRainData"
 import { supabase } from "../lib/supabase";
+import { useAtom } from "jotai";
 
 const screenWidth = Dimensions.get("window").width;
 const currentYear = new Date().getFullYear(); // Obtém o ano atual
 
 export default function RainData() {
+    // Refer to user
     const [user, setUser] = useState<User | null>(null);
+
+    //Consult all data from db
+    const [fazendas, setFazendas] = useAtom(fazendasAtom); // Lista de fazendas
+    const [talhoes, setTalhoes] = useAtom(talhoesAtom); // Lista de talhões
+    const [pluviometros, setPluviometros] = useAtom(pluviometersAtom); // Lista de pluviômetros
+
+    // Options selected
     const [selectedMonth, setSelectedMonth] = useState("January"); // Mês selecionado pelo usuário
     const [selectedYear, setSelectedYear] = useState(currentYear.toString()); // Ano selecionado pelo usuário
-    const [selectedFazenda, setSelectedFazenda] = useState("");
-    const [selectedTalhao, setSelectedTalhao] = useState("");
-    const [selectedPluviometro, setSelectedPluviometro] = useState("");
 
-    // useEffect(() => {
-    //     // Função assíncrona para buscar os detalhes da fazenda, talhão e pluviômetro
-    //     async function fetchFazendaInfo() {
-    //         try {
-    //             // Consulta SQL para buscar informações da fazenda, talhão e pluviômetro
-    //             const { data, error } = await supabase
-    //                 .from("projeto.fazenda")
-    //                 .select("nome")
-    //                 .eq("id", 1); // Supondo que você queira informações da Fazenda com ID 1
+    // Options selected
+    const [selectedFazenda, setSelectedFazenda] = useAtom(selectedFazendaAtom);
+    const [selectedTalhao, setSelectedTalhao] = useAtom(selectedTalhaoAtom);
+    const [selectedPluviometro, setSelectedPluviometro] = useAtom(selectedPluviometerAtom);
 
-    //             if (error) {
-    //                 console.error("Erro ao buscar informações:", error);
-    //                 return;
-    //             }
+    // Custom Toast
+    const [toastVisible, setToastVisible] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState<undefined | 'info' | 'error' | 'success'>(undefined);
 
-    //             // Define os estados com os dados recuperados
-    //             setSelectedFazenda(data[0]?.nome || "Fazenda Luzia"); // Define um valor padrão se não houver dados
-    //             setSelectedTalhao("Talhão A"); // Define um valor padrão
-    //             setSelectedPluviometro("Pluviômetro 1"); // Define um valor padrão
-    //         } catch (error) {
-    //             console.error("Erro ao buscar informações da fazenda:", error);
-    //         }
-    //     }
+    const showToast = (message: string, type?: 'info' | 'error' | 'success') => {
+        setToastMessage(message);
+        setToastVisible(true);
 
-    //     fetchFazendaInfo(); // Chama a função para buscar os detalhes da fazenda, talhão e pluviômetro
-    // }, []); // O segundo argumento [] assegura que useEffect seja chamado apenas uma vez
+        setTimeout(() => {
+            setToastVisible(false);
+        }, 3000);
+
+        setToastType(type);
+    };
 
     // Convert selectedYear to a number
     const yearAsNumber: number = parseInt(selectedYear, 10);
@@ -72,25 +74,39 @@ export default function RainData() {
     return (
         <View style={styles.container}>
             {/* View para mostrar fazenda, talhão e pluviômetro */}
-            {/* <View style={styles.userInfoContainer}>
-                <Text style={styles.userInfoText}>Fazenda: {selectedFazenda}</Text>
-                <Text style={styles.userInfoText}>Talhão: {selectedTalhao}</Text>
-                <Text style={styles.userInfoText}>Pluviômetro: {selectedPluviometro}</Text>
-            </View> */}
+            <View style={styles.userInfoContainer}>
+                <Text style={styles.userInfoText}>Fazenda: {selectedFazenda?.nome}</Text>
+                <Text style={styles.userInfoText}>Talhão: {selectedTalhao?.nome}</Text>
+                <Text style={styles.userInfoText}>Pluviômetro: {selectedPluviometro?.nome}</Text>
+            </View>
 
             <ScrollView>
+                <View style={{ top: -180, width: '100%' }}>
+                    {toastVisible && (
+                        <CustomToast
+                            message={toastMessage}
+                            onHide={() => setToastVisible(false)}
+                            type={toastType} // Fornece um valor padrão
+                        />
+                    )}
+                </View>
                 <View style={styles.bezierLineChartContainer}>
-                    <Text>Quantidade de chuva por meses do ano</Text>
+                    <Text>Quantidade de chuva por ano</Text>
                     <BezierLineChart />
                 </View>
 
-                {/* <View style={styles.pieChartContainer}>
-                    <Text>Componente Pie Chart</Text>
+                <View style={styles.pieChartContainer}>
+                    <Text>Quantidade de chuva por meses do ano</Text>
                     <PieChartComponent />
-                </View> */}
+                </View>
 
                 <View style={styles.barChartContainer}>
-                    <Text>Quantidade de chuva durante o dia</Text>
+                    <Text>Quantidade de chuva por semana</Text>
+                    <BarChartComponent />
+                </View>
+
+                <View style={styles.barChartContainer}>
+                    <Text>Quantidade de chuva por dia</Text>
                     <BarChartComponent />
                 </View>
             </ScrollView>

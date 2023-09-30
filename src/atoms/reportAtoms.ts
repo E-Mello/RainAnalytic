@@ -1,10 +1,9 @@
-// No arquivo reportAtoms.ts
 import { atom } from 'jotai';
 
 // Atoms referente aos formulariosdo relatorio
 export const selectedFazendaAtom = atom<string | null>(null);
 export const selectedTalhaoAtom = atom<string | null>(null);
-export const selectedPluviometerAtom = atom<number[]>([]);
+export const selectedPluviometerAtom = atom<number[] | null>([]);
 export const reportFormatAtom = atom<'pdf' | 'csv' | null>(null);
 export const fazendasAtom = atom<{ id: any; nome: any }[]>([]);
 export const talhoesAtom = atom<{ id: any; nome: any }[]>([]);

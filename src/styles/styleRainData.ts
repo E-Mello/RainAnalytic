@@ -18,6 +18,13 @@ const styles = StyleSheet.create({
         width: "100%",
         alignItems: "center",
     },
+    pieChartContainer: {
+        paddingTop: 10,
+        justifyContent: "center",
+        alignContent: "center",
+        width: "100%",
+        alignItems: "center",
+    },
     barChartContainer: {
         justifyContent: "center",
         alignContent: "center",

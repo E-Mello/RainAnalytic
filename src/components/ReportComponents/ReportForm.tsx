@@ -180,18 +180,22 @@ function ReportForm() {
 
     const handlePluviometerSelection = (pluviometerId: number) => {
         // Verifica se o pluviômetro já está selecionado
-        if (selectedPluviometers.includes(pluviometerId)) {
+        if (selectedPluviometers && selectedPluviometers.includes(pluviometerId)) {
             // Se já estiver selecionado, remova-o da lista de seleção
-            setSelectedPluviometers((prevSelectedPluviometers) =>
-                prevSelectedPluviometers.filter((id) => id !== pluviometerId)
-            );
+            setSelectedPluviometers((prevSelectedPluviometers) => {
+                if (prevSelectedPluviometers != null) {
+                    return prevSelectedPluviometers.filter((id) => id !== pluviometerId);
+                }
+                return null;
+            });
         } else {
             // Caso contrário, adicione-o à lista de seleção
             setSelectedPluviometers((prevSelectedPluviometers) =>
-                [...prevSelectedPluviometers, pluviometerId]
+                prevSelectedPluviometers != null ? [...prevSelectedPluviometers, pluviometerId] : [pluviometerId]
             );
         }
     };
+
 
     return (
         <View>
