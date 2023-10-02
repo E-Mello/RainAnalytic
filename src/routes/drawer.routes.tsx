@@ -3,17 +3,17 @@ import { Button, Input } from 'react-native-elements'
 import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from '../atoms/rainDataAtoms';
 import { useEffect, useState } from 'react';
 
-import Avatar from '../components/Avatar';
+import Avatar from '../components/ProfileComponents/Avatar';
 import BarnIcon from '../components/icons/BarnIcon';
 import Colors from '../constants/Colors';
 import CreateFarm from '../screens/ManageRegistrations';
 import EditRecords from '../screens/EditRecords';
 import { Feather } from '@expo/vector-icons'
-import FieldIcon from '../components/FieldIcon';
+import FieldIcon from '../components/icons/FieldIcon';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link } from '@react-navigation/native';
 import Login from '../screens/Login';
-import ModalScreen from '../components/Modal';
+import ModalScreen from '../components/RainDataComponents/SwitchFarmModal';
 import Report from '../screens/Reports';
 import StackRoutes from './stack.routes';
 import TabRoutes from './tab.routes'

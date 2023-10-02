@@ -1,11 +1,10 @@
 import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from "../atoms/rainDataAtoms";
+import { defaultFazendaAtom, defaultPluviometerAtom, defaultTalhaoAtom, fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from "../atoms/rainDataAtoms";
 
-import BarChartComponent from "../components/BarChartComponent";
-import BezierLineChart from "../components/BezierLineChart";
+import BarChartComponent from "../components/RainDataComponents/BarChartComponent";
+import BezierLineChart from "../components/RainDataComponents/BezierLineChart";
 import CustomToast from '../components/CustomToast';
-import PieChartComponent from "../components/LineChartComponent";
 import { User } from '@supabase/supabase-js';
 import styles from "../styles/styleRainData"
 import { supabase } from "../lib/supabase";
@@ -31,6 +30,24 @@ export default function RainData() {
     const [selectedFazenda, setSelectedFazenda] = useAtom(selectedFazendaAtom);
     const [selectedTalhao, setSelectedTalhao] = useAtom(selectedTalhaoAtom);
     const [selectedPluviometro, setSelectedPluviometro] = useAtom(selectedPluviometerAtom);
+
+    // Constantes default
+    const [defaultFazenda, setDefaultFazenda] = useAtom(defaultFazendaAtom)
+    const [defaultTalhao, setDefaultTalhao] = useAtom(defaultTalhaoAtom)
+    const [defaultPluviometro, setDefaultPluviometro] = useAtom(defaultPluviometerAtom)
+
+    // Verifica se os valores selecionados estão em branco e, em caso afirmativo, define os valores padrão
+    if (!selectedFazenda) {
+        setSelectedFazenda(defaultFazenda);
+    }
+
+    if (!selectedTalhao) {
+        setSelectedTalhao(defaultTalhao);
+    }
+
+    if (!selectedPluviometro) {
+        setSelectedPluviometro(defaultPluviometro);
+    }
 
     // Custom Toast
     const [toastVisible, setToastVisible] = useState(false);
@@ -92,21 +109,16 @@ export default function RainData() {
                 </View>
                 <View style={styles.bezierLineChartContainer}>
                     <Text>Quantidade de chuva por ano</Text>
-                    <BezierLineChart />
+                    <BezierLineChart period="ano" />
                 </View>
 
-                <View style={styles.pieChartContainer}>
+                <View style={styles.bezierLineChartContainer}>
                     <Text>Quantidade de chuva por meses do ano</Text>
-                    <PieChartComponent />
+                    <BezierLineChart period="mes" />
                 </View>
 
                 <View style={styles.barChartContainer}>
                     <Text>Quantidade de chuva por semana</Text>
-                    <BarChartComponent />
-                </View>
-
-                <View style={styles.barChartContainer}>
-                    <Text>Quantidade de chuva por dia</Text>
                     <BarChartComponent />
                 </View>
             </ScrollView>

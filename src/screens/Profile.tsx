@@ -7,7 +7,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { UserProfile } from "../types/Profile";
 import styles from '../styles/styleProfile'
 import { supabase } from "../lib/supabase";
-import { useAuth } from "../components/AuthSupabase";
+import { useAuth } from "../components/AuthComponents/AuthSupabase";
 
 export default function Profile() {
     const { session, user, signOut } = useAuth(); // Obter sessão e usuário do contexto

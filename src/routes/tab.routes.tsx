@@ -1,9 +1,9 @@
 import { Alert, Button, StyleSheet, View } from 'react-native'
 
 import { Feather } from '@expo/vector-icons'
-import FieldIcon from '../components/FieldIcon'
+import FieldIcon from '../components/icons/FieldIcon'
 import { Icon } from 'react-native-elements'
-import ModalScreen from '../components/Modal'
+import ModalScreen from '../components/RainDataComponents/SwitchFarmModal'
 import RainData from '../screens/RainData'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createIconSet } from 'react-native-vector-icons'

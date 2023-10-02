@@ -1,12 +1,12 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from '../atoms/rainDataAtoms';
+import { fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from '../../atoms/rainDataAtoms';
 
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import { isActiveModelAtom } from '../atoms/activeModelAtom';
-import styles from '../styles/styleModal';
-import { supabase } from '../lib/supabase';
+import { isActiveModelAtom } from '../../atoms/activeModelAtom';
+import styles from '../../styles/styleModal';
+import { supabase } from '../../lib/supabase';
 import { useAtom } from 'jotai';
 
 export default function ModalScreen() {
@@ -26,6 +26,11 @@ export default function ModalScreen() {
     const [toastVisible, setToastVisible] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState<undefined | 'info' | 'error' | 'success'>(undefined);
+
+    // Opções selecionadas padrão
+    const defaultSelectedFazendaId = 14;
+    const defaultSelectedTalhaoId = 52;
+    const defaultSelectedPluviometroId = 21;
 
     const showToast = (message: string, type?: 'info' | 'error' | 'success') => {
         setToastMessage(message);
@@ -135,7 +140,7 @@ export default function ModalScreen() {
                         <View>
                             <Text style={styles.subtitle}>Selecione a fazenda:</Text>
                             <Picker
-                                selectedValue={selectedFazenda?.id}
+                                selectedValue={selectedFazenda?.id || defaultSelectedFazendaId} // Define o valor padrão
                                 onValueChange={(itemValue, itemIndex) => {
                                     const selectedFazendaObject = fazendas.find(fazenda => fazenda.id === itemValue);
                                     setSelectedFazenda(selectedFazendaObject);
@@ -149,14 +154,12 @@ export default function ModalScreen() {
                                     />
                                 ))}
                             </Picker>
-
-
                         </View>
 
                         <View>
                             <Text style={styles.subtitle}>Selecione o talhão:</Text>
                             <Picker
-                                selectedValue={selectedTalhao?.id}
+                                selectedValue={selectedTalhao?.id || defaultSelectedTalhaoId} // Define o valor padrão
                                 onValueChange={(value, itemIndex) => {
                                     const selectedTalhaoObject = talhoes.find(talhao => talhao.id === value);
                                     setSelectedTalhao(selectedTalhaoObject);
@@ -175,7 +178,7 @@ export default function ModalScreen() {
                         <View>
                             <Text style={styles.subtitle}>Selecione o pluviômetro:</Text>
                             <Picker
-                                selectedValue={selectedPluviometro}
+                                selectedValue={selectedPluviometro || defaultSelectedPluviometroId} // Define o valor padrão
                                 onValueChange={(itemValue, itemIndex) => {
                                     const selectedPluviometroObject = pluviometros.find(pluviometro => pluviometro.id === itemValue);
                                     setSelectedPluviometro(selectedPluviometroObject);

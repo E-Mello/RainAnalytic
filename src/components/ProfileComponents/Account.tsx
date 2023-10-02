@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import Avatar from './Avatar'
 import { Session } from '@supabase/supabase-js'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../../lib/supabase'
 
 export default function Account({ session }: { session: Session }) {
     const [loading, setLoading] = useState(true)

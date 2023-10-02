@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { AuthProvider } from '../components/AuthSupabase'
+import { AuthProvider } from '../components/AuthComponents/AuthSupabase'
 import DrawerRoutes from './drawer.routes'
 import Login from '../screens/Login'
 import { NavigationContainer } from '@react-navigation/native'
