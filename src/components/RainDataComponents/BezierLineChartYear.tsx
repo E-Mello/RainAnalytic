@@ -1,5 +1,6 @@
 import { Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { VictoryAxis, VictoryChart, VictoryLabel, VictoryLine } from 'victory-native';
 
 import { LineChart } from 'react-native-chart-kit';
 import { Picker } from '@react-native-picker/picker';
@@ -9,13 +10,14 @@ import { useAtom } from 'jotai';
 
 const screenWidth = Dimensions.get('window').width;
 
-type PeriodType = "ano" | "mes" | "semana";
 
-const BezierLineChart = ({ period }: { period: PeriodType }) => {
+const BezierLineChartYear = () => {
     const [selectedYear, setSelectedYear] = useState<string[]>([new Date().getFullYear().toString()]);
     const [precipitationData, setPrecipitationData] = useState<number[]>([]);
     const [isYearPickerVisible, setIsYearPickerVisible] = useState(false);
     const [isPickerYearSelected, setIsPickerYearSelected] = useState('2023');
+    const [precipitationByYear, setPrecipitationByYear] = useState<{ year: string; value: number }[]>([]);
+
 
     // Option selected
     const [selectedPluviometro, setSelectedPluviometro] = useAtom(selectedPluviometerAtom);
@@ -68,28 +70,44 @@ const BezierLineChart = ({ period }: { period: PeriodType }) => {
         }
     };
 
-
     const fetchPrecipitationData = async () => {
         try {
-            if (period === "ano") {
-                const { data, error } = await supabase
-                    .from('precipitacao')
-                    .select('*')
-                    .eq('pluviometro_id', selectedPluviometro?.id)
-                    .lte('data', `${isPickerYearSelected}-12-31`)
-                    .gte('data', `${isPickerYearSelected}-01-01`)
-                console.log(data);
-                console.log(error);
 
-            } else if (period === "mes") {
-                // Fazer dps
-            } else if (period === "semana") {
-                // Fazer dps
+            const { data, error } = await supabase
+                .from('precipitacao')
+                .select('*')
+                .eq('pluviometro_id', selectedPluviometro?.id)
+
+            if (error) {
+                console.error('Erro ao buscar dados de precipitação:', error);
+                return;
+            }
+
+            if (data) {
+                // Agrupar os valores por ano
+                const groupedData: { [year: string]: number } = {};
+                data.forEach((item: any) => {
+                    const year = item.data.substring(0, 4); // Extrair o ano da data
+                    if (groupedData[year]) {
+                        groupedData[year] += item.valor;
+                    } else {
+                        groupedData[year] = item.valor;
+                    }
+                });
+
+                // Converter os dados agrupados em um array de objetos
+                const precipitationValues = Object.keys(groupedData).map((year) => ({
+                    year,
+                    value: groupedData[year],
+                }));
+
+                setPrecipitationByYear(precipitationValues);
             }
         } catch (error) {
             console.error('Erro ao buscar dados de precipitação:', error);
         }
     };
+
 
 
     const toggleYearPicker = () => {
@@ -103,7 +121,16 @@ const BezierLineChart = ({ period }: { period: PeriodType }) => {
         setSelectedYear(updatedYears);
     };
 
-    const exampleData = [100, 60, 40, 30, 90, 100, 80, 120, 90, 140, 110, 60];
+
+    // Usar os arrays "labels" e "data" no gráfico
+    const { labels, data } = precipitationByYear.reduce<{ labels: string[], data: number[] }>(
+        (acc, item) => {
+            acc.labels.push(item.year);
+            acc.data.push(item.value);
+            return acc;
+        },
+        { labels: [], data: [] }
+    );
 
     return (
         <View style={styles.container}>
@@ -136,41 +163,56 @@ const BezierLineChart = ({ period }: { period: PeriodType }) => {
                     </TouchableOpacity>
                 </View>
             </Modal>
-            <Picker
-                selectedValue={isPickerYearSelected}
-                onValueChange={(itemValue, itemIndex) => setIsPickerYearSelected(itemValue)}
-                style={{ height: 50, width: 150 }}
-            >
-                {selectedYear.map((year) => (
-                    <Picker.Item key={year} label={year.toString()} value={year.toString()} />
-                ))}
-            </Picker>
-            <LineChart
-                data={{
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    datasets: [
-                        {
-                            data: exampleData,
-                            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                            strokeWidth: 2,
-                        },
-                    ],
-                }}
+            <VictoryChart
                 width={385}
-                bezier
                 height={220}
-                yAxisLabel=" "
-                yAxisSuffix="m"
-                chartConfig={chartConfig}
-                style={styles.lineChart}
-                decorator={() => {
-                    return (
-                        <View>
-                            {/* <Text>BezierLineChart Decorator</Text> */}
-                        </View>
-                    );
-                }}
-            />
+                padding={{ top: 10, bottom: 40, left: 50, right: 20 }} // Ajuste o padding conforme necessário
+                domainPadding={10} // Ajuste o espaçamento entre os pontos de dados
+            >
+                <VictoryAxis
+                    tickValues={labels} // Defina os valores do eixo X
+                    tickFormat={(tick) => `${tick}`} // Formate os rótulos do eixo X conforme necessário
+                    animate={{
+                        duration: 1000,
+                        onLoad: { duration: 1000 },
+                    }}
+                    style={{
+                        grid: {
+                            stroke: 'black', // Cor das linhas de grade
+                        },
+                    }}
+                />
+                <VictoryAxis
+                    dependentAxis
+                    tickFormat={data} // Formate os rótulos do eixo Y conforme necessário
+                    style={{
+                        grid: {
+                            stroke: 'black', // Cor das linhas de grade
+                        },
+                    }}
+                />
+                <VictoryLine
+                    data={precipitationByYear}
+                    x="year"
+                    y="value"
+                    style={{
+                        data: {
+                            stroke: '#db3f3f', // Cor da linha
+                            strokeWidth: 2, // Largura da linha
+                        },
+                    }}
+                />
+                <VictoryLabel
+                    text="BezierLineChart Decorator"
+                    x={180} // Ajuste a posição do texto conforme necessário
+                    y={20} // Ajuste a posição do texto conforme necessário
+                    style={{
+                        fill: 'white', // Cor do texto
+                        fontSize: 12, // Tamanho da fonte
+                    }}
+                />
+            </VictoryChart>
+
         </View>
     );
 };
@@ -213,4 +255,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default BezierLineChart;
+export default BezierLineChartYear;
