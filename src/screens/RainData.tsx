@@ -2,8 +2,8 @@ import { Dimensions, ScrollView, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { defaultFazendaAtom, defaultPluviometerAtom, defaultTalhaoAtom, fazendasAtom, pluviometersAtom, selectedFazendaAtom, selectedPluviometerAtom, selectedTalhaoAtom, talhoesAtom } from "../atoms/rainDataAtoms";
 
-import BarChartComponent from "../components/RainDataComponents/BarChartComponentWeek";
-import BezierLineChartMonth from "../components/RainDataComponents/BezierLineChartMonth";
+import BarChartWeek from "../components/RainDataComponents/BarChartWeek";
+import BezierLineChartMonth from "../components/RainDataComponents/BarChartMonth";
 import BezierLineChartYear from "../components/RainDataComponents/BezierLineChartYear";
 import CustomToast from '../components/CustomToast';
 import { User } from '@supabase/supabase-js';
@@ -120,7 +120,7 @@ export default function RainData() {
 
                 <View style={styles.barChartContainer}>
                     <Text>Quantidade de chuva por semana</Text>
-                    <BarChartComponent />
+                    <BarChartWeek />
                 </View>
             </ScrollView>
         </View>

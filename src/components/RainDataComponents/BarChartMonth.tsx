@@ -1,19 +1,17 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { VictoryAxis, VictoryChart, VictoryLabel, VictoryLine } from 'victory-native';
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel } from 'victory-native';
 
-import { Picker } from '@react-native-picker/picker';
 import { selectedPluviometerAtom } from '../../atoms/rainDataAtoms';
 import { supabase } from '../../lib/supabase';
 import { useAtom } from 'jotai';
 
-const BezierLineChartMonth = () => {
-    const [selectedYear, setSelectedYear] = useState<string[]>([new Date().getFullYear().toString()]);
+const BezierBarChartMonth = () => {
+    const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
     const [isYearPickerVisible, setIsYearPickerVisible] = useState(false);
     const [precipitationByMonth, setPrecipitationByMonth] = useState<
         { month: string; value: number }[]
     >([]);
-    const [isPickerYearSelected, setIsPickerYearSelected] = useState('2023');
     const [availableYears, setAvailableYears] = useState<string[]>([]);
 
     // Option selected
@@ -27,7 +25,6 @@ const BezierLineChartMonth = () => {
         setIsYearPickerVisible(!isYearPickerVisible);
 
         if (isYearPickerVisible && availableYears.length === 0) {
-            // Buscar os anos disponíveis somente quando o modal estiver visível
             const years = await getAvailableYears();
             setAvailableYears(years);
         }
@@ -38,13 +35,13 @@ const BezierLineChartMonth = () => {
             const response = await supabase
                 .from('years_available')
                 .select('*')
-            const years = response?.data?.map((item: any) => item.ano) || [];
+            const years = response?.data?.map((item: any) => item.ano.toString()) || [];
 
             if (response?.error) {
                 console.error('Erro ao buscar anos disponíveis:', response.error);
             }
 
-            return [...new Set(years)]; // Remover duplicatas usando Set
+            return [...new Set(years)];
         } catch (error) {
             console.error('Erro ao buscar anos disponíveis:', error);
             return [];
@@ -54,7 +51,7 @@ const BezierLineChartMonth = () => {
     const fetchPrecipitationData = async () => {
         try {
             const years = await getAvailableYears();
-            setSelectedYear(years); // Define os anos disponíveis no estado
+            setSelectedYear(years[0]);
         } catch (error) {
             console.error('Erro ao buscar anos disponíveis:', error);
         }
@@ -63,8 +60,8 @@ const BezierLineChartMonth = () => {
                 .from('precipitacao')
                 .select('data, valor')
                 .eq('pluviometro_id', selectedPluviometro?.id)
-                .gte('data', `${selectedYear[0]}-01-01`)
-                .lte('data', `${selectedYear[selectedYear.length - 1]}-12-31`);
+                .gte('data', `${selectedYear}-01-01`)
+                .lte('data', `${selectedYear}-12-31`);
 
             if (error) {
                 console.error('Erro ao buscar dados de precipitação:', error);
@@ -83,16 +80,6 @@ const BezierLineChartMonth = () => {
         }
     };
 
-    // Usar os arrays "labels" e "data" no gráfico
-    const { labels, data } = precipitationByMonth.reduce<{ labels: string[], data: number[] }>(
-        (acc, item) => {
-            acc.labels.push(item.month);
-            acc.data.push(item.value);
-            return acc;
-        },
-        { labels: [], data: [] }
-    );
-
     return (
         <View style={styles.container}>
             <Modal
@@ -102,37 +89,34 @@ const BezierLineChartMonth = () => {
                 onRequestClose={toggleYearPicker}
             >
                 <View style={styles.modalContainer}>
-                    <View style={styles.pickerContainer}>
-                        {availableYears.map((year) => (
-                            <TouchableOpacity
-                                key={year}
-                                style={[
-                                    styles.yearOption,
-                                    selectedYear.includes(year.toString()) && styles.selectedYearOption,
-                                ]}
-                                onPress={() => {
-                                    setSelectedYear([year.toString()]); // Defina selectedYear como uma matriz com um único ano
-                                    toggleYearPicker();
-                                }}
-                            >
-                                <Text>{year.toString()}</Text>
-                            </TouchableOpacity>
-                        ))}
+                    <View style={styles.selectorYear}>
+                        <ScrollView contentContainerStyle={styles.pickerContainer}>
+                            {availableYears.map((year) => (
+                                <TouchableOpacity
+                                    key={year}
+                                    style={[
+                                        styles.yearOption,
+                                        selectedYear === year && styles.selectedYearOption,
+                                    ]}
+                                    onPress={() => {
+                                        setSelectedYear(year);
+                                        toggleYearPicker();
+                                    }}
+                                >
+                                    <Text>{year}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                        <TouchableOpacity style={styles.closeButton} onPress={toggleYearPicker}>
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.closeButton} onPress={toggleYearPicker}>
-                        <Text>Close</Text>
-                    </TouchableOpacity>
                 </View>
             </Modal>
-            <Picker
-                selectedValue={isPickerYearSelected}
-                onValueChange={(itemValue, itemIndex) => setIsPickerYearSelected(itemValue)}
-                style={{ height: 50, width: 150 }}
-            >
-                {availableYears.map((year) => (
-                    <Picker.Item key={year} label={year} value={year} />
-                ))}
-            </Picker>
+            <TouchableOpacity onPress={toggleYearPicker}>
+                <Text>Year: {selectedYear}</Text>        textAlign: 'center',
+
+            </TouchableOpacity>
             <VictoryChart
                 width={385}
                 height={220}
@@ -140,8 +124,7 @@ const BezierLineChartMonth = () => {
                 domainPadding={10}
             >
                 <VictoryAxis
-                    // x-axis
-                    tickValues={labels}
+                    tickValues={precipitationByMonth.map((item) => item.month)}
                     tickFormat={(tick) => `${tick}`}
                     animate={{
                         duration: 1000,
@@ -155,25 +138,23 @@ const BezierLineChartMonth = () => {
                 />
 
                 <VictoryAxis
-                    // y-axis
-                    tickValues={data}
+                    tickValues={precipitationByMonth.map((item) => item.value)}
                     dependentAxis
                     tickFormat={(tick) => `${tick}m`}
                     style={{
                         grid: {
-                            stroke: 'blue',
+                            stroke: 'white',
                         },
                     }}
                     origin={{ x: 0, y: 0 }}
                 />
-                <VictoryLine
+                <VictoryBar
                     data={precipitationByMonth}
                     x="month"
                     y="value"
                     style={{
                         data: {
-                            stroke: '#db3f3f',
-                            strokeWidth: 2,
+                            fill: '#db3f3f',
                         },
                     }}
                 />
@@ -212,6 +193,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         alignItems: 'center',
     },
+    selectorYear: {
+        width: '80%',
+        height: '50%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        justifyContent: 'space-between',
+    },
     selectedYearOption: {
         backgroundColor: '#007AFF',
         borderRadius: 5,
@@ -222,7 +210,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 5,
+        width: '30%',
+        alignSelf: 'center',
+    },
+    closeButtonText: {
+        color: 'white',
+        textAlign: 'center',
     },
 });
 
-export default BezierLineChartMonth;
+export default BezierBarChartMonth;
