@@ -114,8 +114,7 @@ const BezierBarChartMonth = () => {
                 </View>
             </Modal>
             <TouchableOpacity onPress={toggleYearPicker}>
-                <Text>Year: {selectedYear}</Text>        textAlign: 'center',
-
+                <Text>Year: {selectedYear}</Text>
             </TouchableOpacity>
             <VictoryChart
                 width={385}
