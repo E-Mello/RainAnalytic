@@ -9,3 +9,11 @@
 ### Generate native projects with prebuild
 
     https://docs.expo.dev/workflow/customizing/
+
+### Buildando para android
+
+    eas build -p android --profile preview
+
+### Run android emlator
+
+    npx expo run:android -d Pixel_3a_API_34_extension_level_7_x86_64

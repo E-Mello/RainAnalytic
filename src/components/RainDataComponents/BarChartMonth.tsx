@@ -1,8 +1,8 @@
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { VictoryAxis, VictoryBar, VictoryChart, VictoryLabel } from 'victory-native';
+import { alterFetchAtom, selectedPluviometerAtom } from '../../atoms/rainDataAtoms';
 
-import { selectedPluviometerAtom } from '../../atoms/rainDataAtoms';
 import { supabase } from '../../lib/supabase';
 import { useAtom } from 'jotai';
 
@@ -14,20 +14,33 @@ const BezierBarChartMonth = () => {
     >([]);
     const [availableYears, setAvailableYears] = useState<string[]>([]);
 
+    //Const para alterar o fetch
+    const [alterFetch, setAlterFetch] = useAtom(alterFetchAtom)
+
     // Option selected
     const [selectedPluviometro] = useAtom(selectedPluviometerAtom);
 
     useEffect(() => {
-        fetchPrecipitationData();
+        getAvailableYears().then((years) => {
+            setAvailableYears(years);
+        });
     }, []);
+
+    useEffect(() => {
+        fetchPrecipitationData();
+    }, [alterFetch]);
+
+    useEffect(() => {
+        fetchPrecipitationData();
+    }, [selectedYear]);
+
+
+    useEffect(() => {
+        fetchPrecipitationData();
+    }, [alterFetch]);
 
     const toggleYearPicker = async () => {
         setIsYearPickerVisible(!isYearPickerVisible);
-
-        if (isYearPickerVisible && availableYears.length === 0) {
-            const years = await getAvailableYears();
-            setAvailableYears(years);
-        }
     };
 
     const getAvailableYears = async () => {
@@ -49,12 +62,6 @@ const BezierBarChartMonth = () => {
     };
 
     const fetchPrecipitationData = async () => {
-        try {
-            const years = await getAvailableYears();
-            setSelectedYear(years[0]);
-        } catch (error) {
-            console.error('Erro ao buscar anos disponíveis:', error);
-        }
         try {
             const { data, error } = await supabase
                 .from('precipitacao')
@@ -79,6 +86,16 @@ const BezierBarChartMonth = () => {
             console.error('Erro ao buscar dados de precipitação:', error);
         }
     };
+
+    // Usar os arrays "labels" e "data" no gráfico
+    const { labels, data } = precipitationByMonth.reduce<{ labels: string[], data: number[] }>(
+        (acc, item) => {
+            acc.labels.push(item.month);
+            acc.data.push(item.value);
+            return acc;
+        },
+        { labels: [], data: [] }
+    );
 
     return (
         <View style={styles.container}>
@@ -122,8 +139,9 @@ const BezierBarChartMonth = () => {
                 padding={{ top: 10, bottom: 40, left: 50, right: 20 }}
                 domainPadding={10}
             >
-                <VictoryAxis
-                    tickValues={precipitationByMonth.map((item) => item.month)}
+
+                <VictoryAxis // X
+                    tickValues={labels}
                     tickFormat={(tick) => `${tick}`}
                     animate={{
                         duration: 1000,
@@ -136,10 +154,10 @@ const BezierBarChartMonth = () => {
                     }}
                 />
 
-                <VictoryAxis
-                    tickValues={precipitationByMonth.map((item) => item.value)}
+                <VictoryAxis // Y
+                    tickValues={data}
                     dependentAxis
-                    tickFormat={(tick) => `${tick}m`}
+                    tickFormat={(tick) => `${tick}`}
                     style={{
                         grid: {
                             stroke: 'white',
@@ -187,6 +205,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
+        borderColor: 'black',
     },
     yearOption: {
         paddingVertical: 10,
