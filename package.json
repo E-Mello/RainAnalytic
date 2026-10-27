@@ -55,7 +55,7 @@
     "react-native-windows": "^0.72.10",
     "semver": "^7.5.4",
     "victory-native": "^36.6.11",
-    "zod": "^3.22.2"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
